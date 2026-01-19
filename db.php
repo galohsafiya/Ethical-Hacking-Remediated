@@ -1,9 +1,8 @@
 <?php
-// Secure PDO connection
 $host = 'localhost';
 $db   = 'technovation';
-$user = 'root';
-$pass = ''; 
+$user = 'techuser'; // Restored from your old db.php
+$pass = 'techpass'; // Restored from your old db.php
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
@@ -16,6 +15,8 @@ $options = [
 try {
      $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-     throw new \PDOException($e->getMessage(), (int)$e->getCode());
+     // During Phase 3 testing, uncomment the line below to see the error
+     // echo "Connection failed: " . $e->getMessage(); 
+     die("A database error occurred."); 
 }
 ?>
