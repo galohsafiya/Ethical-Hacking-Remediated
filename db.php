@@ -1,8 +1,9 @@
 <?php
+// db.php
 $host = 'localhost';
 $db   = 'technovation';
-$user = 'techuser'; // Restored from your old db.php
-$pass = 'techpass'; // Restored from your old db.php
+$user = 'techuser';  // Change 'root' to 'techuser'
+$pass = 'techpass';  // Change to 'techpass'
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
@@ -15,7 +16,7 @@ $options = [
 try {
      $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-     echo "Connection failed: " . $e->getMessage(); 
-     die("A database error occurred."); 
+     // In Phase 3, we hide the raw error from the user
+     die("A system error occurred. Please try again later."); 
 }
 ?>
