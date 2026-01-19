@@ -1,40 +1,39 @@
 <?php
-include 'db.php';
+// Start session for session management remediation [cite: 53]
+session_start(); 
+include 'db.php'; // Ensure db.php now defines $pdo
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $u = $_POST['username'];
-    $p = $_POST['password'];
-
-    $sql = "SELECT * FROM users WHERE username='$u' AND password='$p'";
-    $res = mysqli_query($conn, $sql);
-
-    if (mysqli_num_rows($res) > 0) {
-        $_SESSION['user'] = $u;
-        $message = "Login successful. Welcome $u";
+    // 1. Basic validation for "Broken Authentication" [cite: 59, 438]
+    if (empty($_POST['username']) || empty($_POST['password'])) {
+        $message = "Login failed: Username and password are required.";
     } else {
-        $message = "Login failed";
+        $u = $_POST['username'];
+        $p = $_POST['password'];
+
+        try {
+            // 2. Use Prepared Statements to fix SQL Injection [cite: 89, 438, 569]
+            // We use place holders (?) instead of variables in the string
+            $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
+            $stmt->execute([$u, $p]);
+            $user = $stmt->fetch();
+
+            if ($user) {
+                // 3. Fix Broken Session Management by setting session variables properly [cite: 438]
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = $user['role'];
+                
+                $message = "Login successful. Welcome " . htmlspecialchars($user['username']);
+            } else {
+                $message = "Login failed: Invalid credentials.";
+            }
+        } catch (PDOException $e) {
+            // Do not echo the actual error $e->getMessage() in production 
+            // to avoid "Information Disclosure" [cite: 496]
+            $message = "A system error occurred. Please try again later.";
+        }
     }
 }
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
-
-<?php if ($message): ?>
-<p><strong><?php echo $message; ?></strong></p>
-<?php endif; ?>
-
-<h2>Login</h2>
-
-<form method="POST">
-    Username: <input name="username"><br><br>
-    Password: <input name="password"><br><br>
-    <button type="submit">Login</button>
-</form>
-
-</body>
-</html>
