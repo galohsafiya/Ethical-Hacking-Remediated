@@ -1,15 +1,27 @@
 <?php
 include 'navbar.php';
-include 'db.php';
+include 'db.php'; // Ensure db.php now defines a PDO connection as $pdo
 
+// Get search query and set to empty string if not provided
 $q = isset($_GET['q']) ? $_GET['q'] : '';
-//XSS
+
+// 1. FIX XSS: Use htmlspecialchars() to encode user input before display
 if (!empty($q)) {
-    echo "<p>Search results for: $q</p>";
+    $safe_q = htmlspecialchars($q, ENT_QUOTES, 'UTF-8');
+    echo "<p>Search results for: <strong>$safe_q</strong></p>";
 }
 
-$sql = "SELECT * FROM products WHERE name LIKE '%$q%'";
-$result = mysqli_query($conn, $sql);
+// 2. FIX SQL INJECTION: Use a PDO Prepared Statement
+// Use placeholders (?) instead of variables directly in the query string
+$sql = "SELECT * FROM products WHERE name LIKE ?";
+$stmt = $pdo->prepare($sql);
+
+// Add wildcards to the search term
+$searchTerm = "%$q%";
+$stmt->execute([$searchTerm]);
+
+// Fetch all results
+$products = $stmt->fetchAll();
 ?>
 
 <h2>Product Catalog</h2>
@@ -17,17 +29,23 @@ $result = mysqli_query($conn, $sql);
 <hr>
 
 <form method="GET">
-    <input type="text" name="q" placeholder="Search products">
+    <input type="text" name="q" value="<?php echo htmlspecialchars($q, ENT_QUOTES, 'UTF-8'); ?>" placeholder="Search products">
     <button type="submit">Search</button>
 </form>
 
 <hr>
 
 <?php
-while ($row = mysqli_fetch_assoc($result)) {
-    echo "<h3>" . $row['name'] . "</h3>";
-    echo "<p>Price: RM " . $row['price'] . "</p>";
-    echo "<a href='cart.php?id=" . $row['id'] . "'>Add to Cart</a>";
-    echo "<hr>";
+// Loop through the secured results
+if (count($products) > 0) {
+    foreach ($products as $row) {
+        // Encode database outputs as a best practice for "Defense in Depth"
+        echo "<h3>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "</h3>";
+        echo "<p>Price: RM " . htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8') . "</p>";
+        echo "<a href='cart.php?id=" . (int)$row['id'] . "'>Add to Cart</a>";
+        echo "<hr>";
+    }
+} else {
+    echo "<p>No products found matching your search.</p>";
 }
 ?>
