@@ -15,8 +15,7 @@ $options = [
 try {
      $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-     // During Phase 3 testing, uncomment the line below to see the error
-     // echo "Connection failed: " . $e->getMessage(); 
+     echo "Connection failed: " . $e->getMessage(); 
      die("A database error occurred."); 
 }
 ?>
