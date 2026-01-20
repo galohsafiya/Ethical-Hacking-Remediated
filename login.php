@@ -1,7 +1,7 @@
 <?php
 // Start session for session management remediation
 session_start(); 
-include 'db.php'; // Ensure db.php now defines $pdo
+include 'db.php'; // Ensure db.php defines $pdo
 $message = '';
 $redirect = false;
 
@@ -14,12 +14,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $p = $_POST['password'];
 
         try {
-            // 2. Use Prepared Statements to fix SQL Injection (OWASP A03)
-            $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
-            $stmt->execute([$u, $p]);
+            // 2. Fetch the user by username ONLY (Prepared Statement)
+            $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+            $stmt->execute([$u]);
             $user = $stmt->fetch();
 
-            if ($user) {
+            // 3. Use password_verify to check Bcrypt hash (Remediates Data at Rest)
+            if ($user && password_verify($p, $user['password'])) {
+
+                // 4. Regenerate session ID to prevent Session Fixation (OWASP A01)
+                session_regenerate_id(true);
+         
                 // 3. Fix Broken Session Management (OWASP A01/A07)
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user'] = $user['username'];
