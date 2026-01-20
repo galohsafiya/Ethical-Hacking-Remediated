@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../db.php';
+include '../db.php'; // This must define $pdo
 include '../navbar.php';
 
 if (!isset($_SESSION['user'])) {
@@ -10,20 +10,25 @@ if (!isset($_SESSION['user'])) {
 
 $user = $_SESSION['user'];
 
-/* User metrics */
-$total_orders = mysqli_fetch_assoc(
-    mysqli_query(
-        $conn,
-        "SELECT COUNT(*) AS total FROM orders WHERE username='$user'"
-    )
-)['total'];
+try {
+    // REMEDIATION: Use PDO Prepared Statements instead of mysqli_query
+    // This prevents SQL Injection in the dashboard metrics
+    
+    // 1. Get total orders
+    $stmt1 = $pdo->prepare("SELECT COUNT(*) AS total FROM orders WHERE username = ?");
+    $stmt1->execute([$user]);
+    $total_orders = $stmt1->fetch()['total'];
 
-$last_order = mysqli_fetch_assoc(
-    mysqli_query(
-        $conn,
-        "SELECT total FROM orders WHERE username='$user' ORDER BY id DESC LIMIT 1"
-    )
-);
+    // 2. Get last order
+    $stmt2 = $pdo->prepare("SELECT total FROM orders WHERE username = ? ORDER BY id DESC LIMIT 1");
+    $stmt2->execute([$user]);
+    $last_order = $stmt2->fetch();
+
+} catch (PDOException $e) {
+    // Silently handle error or log it - prevents Information Disclosure
+    $total_orders = 0;
+    $last_order = null;
+}
 ?>
 
 <style>
