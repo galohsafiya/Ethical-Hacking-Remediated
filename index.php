@@ -9,29 +9,29 @@ if (isset($_POST['login'])) {
     $p = $_POST['password'];
 
     try {
-        // 1. FIXED: Using PDO Prepared Statements to prevent SQL Injection
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
-        $stmt->execute([$u, $p]);
+        // 1. SQL Injection Prevention: Use PDO Prepared Statements 
+        // 2. Bcrypt Hash: Fetch by username only
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute([$u]);
         $user = $stmt->fetch();
 
-        if ($user) {
-            // 2. FIXED: Proper Session Management
+        // 3. Bcrypt Hash: Use password_verify to check the Bcrypt hash
+        if ($user && password_verify($p, $user['password'])) {
             $_SESSION['user'] = $user['username'];
             $_SESSION['role'] = $user['role'];
 
-            // 3. FIXED: Secure Redirection based on Role
-            if ($user['role'] === 'admin') {
-                header("Location: admin/admin.php");
-            } else {
-                header("Location: user/dashboard.php");
-            }
-            exit;
+        if ($user['role'] === 'admin') {
+            header("Location: admin/admin.php");
         } else {
-            // 4. FIXED: Generic Error Message (Prevents Username Enumeration)
-            $error = "Invalid login credentials.";
+            header("Location: user/dashboard.php");
         }
+        exit;
+    } else {
+        $error = "Invalid login credentials.";
+    }
+}
     } catch (PDOException $e) {
-        // 5. FIXED: Preventing Information Disclosure
+        // 5. Preventing Information Disclosure
         $error = "A system error occurred. Please try again later.";
     }
 }
