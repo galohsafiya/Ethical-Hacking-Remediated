@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db.php'; // Using your new PDO connection
+include 'db.php'; 
 
 $error = '';
 
@@ -20,16 +20,17 @@ if (isset($_POST['login'])) {
             $_SESSION['user'] = $user['username'];
             $_SESSION['role'] = $user['role'];
 
-        if ($user['role'] === 'admin') {
-            header("Location: admin/admin.php");
+            if ($user['role'] === 'admin') {
+                header("Location: admin/admin.php");
+            } else {
+                header("Location: user/dashboard.php");
+            }
+            exit; 
         } else {
-            header("Location: user/dashboard.php");
+            // This now correctly triggers if user is not found OR password is wrong
+            $error = "Invalid login credentials.";
         }
-        exit;
-    } else {
-        $error = "Invalid login credentials.";
-    }
-}
+        
     } catch (PDOException $e) {
         // 5. Preventing Information Disclosure
         $error = "A system error occurred. Please try again later.";
