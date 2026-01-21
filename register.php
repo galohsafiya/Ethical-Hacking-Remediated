@@ -38,3 +38,22 @@ if (isset($_POST['register'])) {
     }
 }
 ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+</head>
+<body>
+
+<h2>Register</h2>
+
+<form method="POST">
+    Username: <input name="username"><br><br>
+    Password: <input type="password" name="password"><br><br>
+    <button name="register">Register</button>
+</form>
+
+<p><a href="index.php">Back to Login</a></p>
+
+</body>
+</html>
