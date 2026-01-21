@@ -5,7 +5,7 @@ include 'db.php';
 $error = '';
 
 if (isset($_POST['login'])) {
-    $u = $_POST['username'];
+    $u = trim($_POST['username']);
     $p = $_POST['password'];
 
     try {
