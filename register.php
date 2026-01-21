@@ -24,10 +24,10 @@ if (isset($_POST['register'])) {
                 // 3. FIX SQL INJECTION: Use Prepared Statements
                 $sql = "INSERT INTO users (username, password, role) VALUES (?, ?, 'user')";
                 $stmt = $pdo->prepare($sql);
-                
-                // For this lab, we use $p directly to match your DB schema, 
-                // but in a real-world patch, you would use password_hash($p, PASSWORD_BCRYPT).
-                $stmt->execute([$u, $p]);
+
+                // 4. DATA AT REST:Bc rypt Hashing
+                $hashed_p = password_hash($p, PASSWORD_DEFAULT);
+                $stmt->execute([$u, $hashed_p]);
 
                 header("Location: index.php?msg=Registration successful");
                 exit;
