@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../db.php'; // Using your new PDO connection
+include '../db.php';
 include '../navbar.php';
 
 // 1. REMEDIATION: Broken Access Control (A01:2021)
@@ -11,7 +11,6 @@ if (!isset($_SESSION['user']) || $_SESSION['role'] !== 'admin') {
 }
 
 try {
-    /* Overview metrics using PDO */
     $total_users = $pdo->query("SELECT COUNT(*) FROM users WHERE role != 'admin'")->fetchColumn();
     $total_products = $pdo->query("SELECT COUNT(*) FROM products")->fetchColumn();
     $total_orders = $pdo->query("SELECT COUNT(*) FROM orders")->fetchColumn();
@@ -19,7 +18,6 @@ try {
     $revenue_stmt = $pdo->query("SELECT SUM(total) FROM orders");
     $total_revenue = $revenue_stmt->fetchColumn() ?? 0;
 
-    /* Most sold product */
     $most_sold = $pdo->query("
         SELECT p.name, SUM(oi.quantity) AS sold
         FROM order_items oi
@@ -29,7 +27,6 @@ try {
         LIMIT 1
     ")->fetch();
 
-    /* Top customers */
     $top_customers = $pdo->query("
         SELECT username, SUM(total) AS spent
         FROM orders
@@ -38,7 +35,6 @@ try {
         LIMIT 3
     ")->fetchAll();
 
-    /* Recent orders */
     $recent_orders = $pdo->query("SELECT * FROM orders ORDER BY id DESC LIMIT 5")->fetchAll();
 
 } catch (PDOException $e) {
