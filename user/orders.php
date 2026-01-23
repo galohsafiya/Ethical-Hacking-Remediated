@@ -20,7 +20,7 @@ $user = $_SESSION['user'];
 <?php
 try {
     /** * REMEDIATION: SQL INJECTION PREVENTION (OWASP A03:2021)
-     * Replaced legacy mysqli_query with a PDO Prepared Statement[cite: 1145, 1158].
+     * Replaced legacy mysqli_query with a PDO Prepared Statement.
      * Even though the source is a session variable, using placeholders (?) 
      * ensures the query logic is isolated from the data[cite: 1150].
      */
@@ -35,7 +35,7 @@ try {
     } else {
         foreach ($orders as $o) {
             /** * REMEDIATION: CROSS-SITE SCRIPTING (XSS) PROTECTION
-             * Applying htmlspecialchars() to all database outputs[cite: 1180, 1224].
+             * Applying htmlspecialchars() to all database outputs.
              * This prevents 'Stored XSS' where an attacker might have injected 
              * scripts into fields like the 'address'[cite: 148].
              */
