@@ -5,7 +5,7 @@ include '../navbar.php';
 
 /** * REMEDIATION: BROKEN ACCESS CONTROL (OWASP A01:2021)
  * Enforcing server-side session validation to ensure only authenticated 
- * users can access their order history[cite: 148].
+ * users can access their order history.
  */
 if (!isset($_SESSION['user'])) {
     header("Location: ../index.php");
@@ -22,7 +22,7 @@ try {
     /** * REMEDIATION: SQL INJECTION PREVENTION (OWASP A03:2021)
      * Replaced legacy mysqli_query with a PDO Prepared Statement.
      * Even though the source is a session variable, using placeholders (?) 
-     * ensures the query logic is isolated from the data[cite: 1150].
+     * ensures the query logic is isolated from the data.
      */
     $stmt = $pdo->prepare("SELECT * FROM orders WHERE username = ? ORDER BY id DESC");
     $stmt->execute([$user]);
@@ -37,7 +37,7 @@ try {
             /** * REMEDIATION: CROSS-SITE SCRIPTING (XSS) PROTECTION
              * Applying htmlspecialchars() to all database outputs.
              * This prevents 'Stored XSS' where an attacker might have injected 
-             * scripts into fields like the 'address'[cite: 148].
+             * scripts into fields like the 'address'.
              */
             $safe_id = htmlspecialchars($o['id'], ENT_QUOTES, 'UTF-8');
             $safe_total = htmlspecialchars(number_format($o['total'], 2), ENT_QUOTES, 'UTF-8');
@@ -54,7 +54,7 @@ try {
 } catch (PDOException $e) {
     /** * REMEDIATION: INFORMATION DISCLOSURE PREVENTION
      * Suppressing raw SQL error messages to prevent leaking database 
-     * schemas to the end-user[cite: 1158].
+     * schemas to the end-user.
      */
     error_log("Order Retrieval Error: " . $e->getMessage());
     echo "<p>Unable to retrieve orders at this time. Please try again later.</p>";
