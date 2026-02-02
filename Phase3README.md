@@ -1,3 +1,4 @@
+Phase 3 - Remediation and Patches
 TechNovation Solutions – Secure Web Portal (Phase 3)
 GitHub Repository: https://github.com/galohsafiya/Ethical-Hacking-Remediated.git
 
@@ -39,3 +40,4 @@ Deployment Instructions
 1. Clone the Repository: git clone https://github.com/galohsafiya/Ethical-Hacking-Remediated.git
 2. Follow the Remediation Steps provided in the document
 3. Verification: Conduct a follow-up scan to verify that all previously identified vulnerabilities are successfully remediated.
+
